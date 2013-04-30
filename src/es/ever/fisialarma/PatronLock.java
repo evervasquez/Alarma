@@ -2,11 +2,6 @@ package es.ever.fisialarma;
 
 import java.util.ArrayList;
 import java.util.List;
-import lockpanttern.EmergencyExit;
-import lockpanttern.LockPatternView;
-import lockpanttern.PatternGenerator;
-import lockpanttern.Point;
-import lockpanttern.dialogos;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -26,17 +21,13 @@ public class PatronLock extends Activity implements OnCompletionListener {
 	// An ID of the alarm dialog
 	public static final int DIALOG_SEPARATION_WARNING = 0,
 			DIALOG_EXITED_HARD = 1;
-	protected LockPatternView mPatternView;
-	protected PatternGenerator mGenerator;
 	protected int mGridLength;
 	protected int mPatternMin;
 	protected int mPatternMax;
-	dialogos dialogo;
 	public Button mGenerateButton;
 	private ToggleButton mPracticeToggle;
 	protected String mHighlightMode;
 	protected boolean mTactileFeedback;
-	private List<Point> mEasterEggPattern;
 	private static final int DIALOG_ALARM = 0;
 	flash flashito = null;
 	MediaPlayer player;
@@ -48,69 +39,8 @@ public class PatronLock extends Activity implements OnCompletionListener {
 	@Override
 	public void onCreate(Bundle state) {
 		super.onCreate(state);
-		mGenerator = new PatternGenerator();
-
-		final Thread.UncaughtExceptionHandler exceptionHandler = Thread
-				.getDefaultUncaughtExceptionHandler();
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable throwable) {
-				if (throwable instanceof OutOfMemoryError) {
-					EmergencyExit.clearAndBail(PatronLock.this);
-				}
-				// punt if it's not an exception we can handle
-				exceptionHandler.uncaughtException(thread, throwable);
-			}
-		});
-
-		mEasterEggPattern = new ArrayList<Point>();
-		mEasterEggPattern.add(new Point(0, 2));
-		mEasterEggPattern.add(new Point(0, 1));
-		mEasterEggPattern.add(new Point(0, 0));
-		mEasterEggPattern.add(new Point(1, 1));
-		mEasterEggPattern.add(new Point(2, 2));
-		mEasterEggPattern.add(new Point(2, 1));
-		mEasterEggPattern.add(new Point(2, 0));
 
 		setContentView(R.layout.patronlock_activity);
-		mPatternView = (LockPatternView) findViewById(R.id.pattern_view);
-		mGenerateButton = (Button) findViewById(R.id.generate_button);
-		mPracticeToggle = (ToggleButton) findViewById(R.id.practice_toggle);
-
-		mGenerateButton.setText("Tienes 3 intentos");
-		mGenerateButton.setOnClickListener(new Button.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				mPatternView.setPattern(mGenerator.getPattern());
-				mPatternView.invalidate();
-			}
-		});
-		mGenerateButton
-				.setOnLongClickListener(new Button.OnLongClickListener() {
-					@Override
-					public boolean onLongClick(View view) {
-						if (mPatternView.getGridLength() == 3) {
-							LockPatternView.HighlightMode oldHighlight = mPatternView
-									.getHighlightMode();
-							mPatternView
-									.setHighlightMode(new LockPatternView.NoHighlight());
-							mPatternView.setPattern(mEasterEggPattern);
-							mPatternView.setHighlightMode(oldHighlight, true);
-						}
-						mPatternView.invalidate();
-						return true;
-					}
-				});
-
-		mPracticeToggle
-				.setOnCheckedChangeListener(new ToggleButton.OnCheckedChangeListener() {
-					public void onCheckedChanged(CompoundButton buttonView,
-							boolean isChecked) {
-						mGenerateButton.setEnabled(!isChecked);
-						mPatternView.setPracticeMode(isChecked);
-						mPatternView.invalidate();
-					}
-				});
 
 		Intent intent = getIntent();
 		Bundle extras = intent.getExtras();
@@ -146,34 +76,9 @@ public class PatronLock extends Activity implements OnCompletionListener {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		// se envian los parametros por primera vez
-		updateFromPrefs();
 		super.onResume();
 	}
 
-	private void updateFromPrefs() {
-		int gridLength = 3;
-		int patternMin = 5;
-		int patternMax = 5;
-		String highlightMode = "first";
-		boolean tactileFeedback = false;
-
-		// only update values that differ
-		if (gridLength != mGridLength) {
-			setGridLength(gridLength);
-		}
-		if (patternMax != mPatternMax) {
-			setPatternMax(patternMax);
-		}
-		if (patternMin != mPatternMin) {
-			setPatternMin(patternMin);
-		}
-		if (!highlightMode.equals(mHighlightMode)) {
-			setHighlightMode(highlightMode);
-		}
-		if (tactileFeedback ^ mTactileFeedback) {
-			setTactileFeedback(tactileFeedback);
-		}
-	}
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -212,62 +117,4 @@ public class PatronLock extends Activity implements OnCompletionListener {
 		super.onBackPressed();
 	}
 	
-	/*public boolean onTouchEvent(MotionEvent event){
-    	int count = 0;
-		switch(event.getAction())
-        {
-            case MotionEvent.ACTION_DOWN:
-            	
-            case MotionEvent.ACTION_MOVE:
-
-
-            case MotionEvent.ACTION_UP:
-
-            	if(mPatternView.validacion && count == 0){
-            	dialogos dialogo = new dialogos();
-            	dialogo.Dialogo_Alerta(this, "correcto");
-            	count = count +1;
-            	}
-            default:
-                return super.onTouchEvent(event);
-        }
-		
-	}*/
-	private void setGridLength(int length) {
-		mGridLength = length;
-		mGenerator.setGridLength(length);
-		mPatternView.setGridLength(length);
-	}
-
-	private void setPatternMin(int nodes) {
-		mPatternMin = nodes;
-		mGenerator.setMinNodes(nodes);
-	}
-
-	private void setPatternMax(int nodes) {
-		mPatternMax = nodes;
-		mGenerator.setMaxNodes(nodes);
-	}
-
-	private void setHighlightMode(String mode) {
-		if ("no".equals(mode)) {
-			mPatternView.setHighlightMode(new LockPatternView.NoHighlight());
-		} else if ("first".equals(mode)) {
-			mPatternView.setHighlightMode(new LockPatternView.FirstHighlight());
-		} else if ("rainbow".equals(mode)) {
-			mPatternView
-					.setHighlightMode(new LockPatternView.RainbowHighlight());
-		}
-
-		mHighlightMode = mode;
-	}
-
-	private void setTactileFeedback(boolean enabled) {
-		mTactileFeedback = enabled;
-		mPatternView.setTactileFeedbackEnabled(enabled);
-	}
-	
-	public void verdad(){
-		mGenerateButton.setText("2");
-	}
 }
