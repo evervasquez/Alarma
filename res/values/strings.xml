@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Despierta!!</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="crear">Crear Alarma</string>
+    <string name="mensaje">Mensaje de Alarma</string>
+    <string name="lunes">L</string>
+    <string name="martes">M</string>
+    <string name="miercoles">M</string>
+    <string name="Jueves">J</string>
+    <string name="viernes">V</string>
+    <string name="escoja">Escoja Los días</string>
+    <string name="repeticiones">Repeticiones</string>
+    <string name="tiempo_separacion">Tiempo de Separación</string>
+    <string name="iniciar">Comenzar</string>
+    <string name="responder">Iniciar</string>
+
+</resources>
