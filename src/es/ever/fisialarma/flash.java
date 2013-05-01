@@ -21,7 +21,9 @@ public class flash {
 	Timer timer, timer2;
 
 	public flash(Context context) {
+		if(dispCamara == null){
 		dispCamara = Camera.open();
+		}
 		contexto = context;
 		
 			timer = new Timer();

@@ -6,15 +6,18 @@
     <string name="hello_world">Hello world!</string>
     <string name="crear">Crear Alarma</string>
     <string name="mensaje">Mensaje de Alarma</string>
-    <string name="lunes">L</string>
-    <string name="martes">M</string>
-    <string name="miercoles">M</string>
-    <string name="Jueves">J</string>
-    <string name="viernes">V</string>
+	<string name="notice">Noticia:</string>
     <string name="escoja">Escoja Los días</string>
     <string name="repeticiones">Repeticiones</string>
+    <string name="light">Click Para Iniciar</string>
     <string name="tiempo_separacion">Tiempo de Separación</string>
     <string name="iniciar">Comenzar</string>
+    <string name="cont">Continuar</string>
+    <string name="separation_warning">Es la primera vez que usa Despierta!!.\n\nPara poder usar la aplicación Despierta!! tienes que configurar un patrón de bloqueo para poder desactivarla cuando te despierte.</string>
     <string name="responder">Iniciar</string>
-
+	 <string name="failed">Failed</string>
+	 <string name="cancelar">Cancelar</string>
+    <string name="pmsg_min_wired_dots">Minimum wired dots: %1$,d</string>
+    <string name="pmsg_max_tries_allowed">Maximum tries: %1$,d</string>
+    <string name="separation_warning_disable">Esto sólo se le pedirá por única vez.</string>
 </resources>

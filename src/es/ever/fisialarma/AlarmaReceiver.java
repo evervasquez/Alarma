@@ -14,7 +14,6 @@ public class AlarmaReceiver extends BroadcastReceiver{
 			if (ALARM_ACTION_NAME.equals(intent.getAction())) {
 				// Launch the alarm popup dialog
 				Intent alarmIntent = new Intent("android.intent.action.MAIN");
-
 				alarmIntent.setClass(context, PatronLock.class);
 				alarmIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
@@ -60,4 +59,10 @@ public class AlarmaReceiver extends BroadcastReceiver{
 			 * pending intent to your component // .... }
 			 */
 		}
+		
+		public void stop() {
+			// TODO Auto-generated method stub
+			abortBroadcast();
+		}
+		
 }

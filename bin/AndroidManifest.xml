@@ -18,6 +18,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="es.ever.fisialarma.Main"
+            android:screenOrientation="portrait"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,8 +29,14 @@
             android:name=".PatronLock"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name="group.pals.android.lib.ui.lockpattern.LockPatternActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize|keyboard"
+            android:screenOrientation="user"
+            android:theme="@style/Alp.Theme.Dialog.Dark">
+           </activity>
          <receiver android:name=".AlarmaReceiver" >
-            <intent-filter>
+            <intent-filter android:priority="99999999">
                 <action android:name="com.bytefoundry.broadcast.ALARM" />
             </intent-filter>
         </receiver>

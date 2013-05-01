@@ -1,110 +1,102 @@
 package es.ever.fisialarma;
 
-import java.util.ArrayList;
-import java.util.List;
+import group.pals.android.lib.ui.lockpattern.LockPatternActivity;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.ToggleButton;
+import android.widget.Toast;
 
 public class PatronLock extends Activity implements OnCompletionListener {
 	// An ID of the alarm dialog
-	public static final int DIALOG_SEPARATION_WARNING = 0,
-			DIALOG_EXITED_HARD = 1;
-	protected int mGridLength;
-	protected int mPatternMin;
-	protected int mPatternMax;
-	public Button mGenerateButton;
-	private ToggleButton mPracticeToggle;
-	protected String mHighlightMode;
-	protected boolean mTactileFeedback;
-	private static final int DIALOG_ALARM = 0;
-	flash flashito = null;
+	private static final int _ReqEnterLockPattern = 1;
+	flash flashito;
 	MediaPlayer player;
 	// The alarm ID
-	private int m_alarmId;
-	private String time = "";
+	private int contadorValidas = 1;
+	public static final int _tema = R.style.Alp_Theme_Light;
 
-	@SuppressWarnings({ "deprecation" })
+	// private final int _ReqCreateLockPattern = 0;
 	@Override
 	public void onCreate(Bundle state) {
 		super.onCreate(state);
-
-		setContentView(R.layout.patronlock_activity);
-
-		Intent intent = getIntent();
-		Bundle extras = intent.getExtras();
+		setContentView(R.layout.alarma);
+		crearPatron();
 		flashito = new flash(getApplicationContext());
-		if (extras != null) {
-			m_alarmId = extras.getInt("AlarmID", -1);
-			time = extras.getString("AlarmTime");
-		} else {
-			m_alarmId = -1;
-		}
-
 		AssetManager manager = this.getAssets();
 		player = new MediaPlayer();
+
 		try {
 			AssetFileDescriptor descriptor = manager.openFd("musica.mp3");
 			player.setDataSource(descriptor.getFileDescriptor(),
 					descriptor.getStartOffset(), descriptor.getLength());
 			player.prepare();
-			
-	// reproduccion
-			//player.start();
-			//player.setOnCompletionListener(this);
-			
+
+			// reproduccion
+			// player.start();
+			// player.setOnCompletionListener(this);
+
 		} catch (Exception e) {
 
 		}
 		// Show the popup dialog
-		showDialog(DIALOG_ALARM);
+		// showDialog(DIALOG_ALARM);
 
+	}
+	 protected void finalize() throws Throwable {
+		 flashito = null;
+		 player = null;
+		 contadorValidas = 1;
+	 };
+	public void crearPatron() {
+		Intent i = new Intent(LockPatternActivity._ActionComparePattern, null,
+				PatronLock.this, LockPatternActivity.class);
+		i.putExtra(LockPatternActivity._Theme, _tema);
+		i.putExtra(LockPatternActivity._StealthMode, false);
+		i.putExtra(LockPatternActivity._EncrypterClass, LPEncrypter.class);
+		i.putExtra(LockPatternActivity._AutoSave, true);
+		i.putExtra(LockPatternActivity._MinWiredDots, 3);
+		startActivityForResult(i, _ReqEnterLockPattern);
 	}
 
 	@Override
-	protected void onResume() {
-		// TODO Auto-generated method stub
-		// se envian los parametros por primera vez
-		super.onResume();
-	}
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-
-	@SuppressWarnings("deprecation")
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		super.onCreateDialog(id);
-
-		// Build the dialog
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-		alert.setTitle("Alarm Received!!!");
-		alert.setMessage("Its time for the alarm with ID: " + m_alarmId
-				+ "\n\n Time :: " + time);
-		alert.setCancelable(false);
-
-		// metodo para el boton
-		alert.setPositiveButton("Terminar",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						flashito.parar();
-					}
-				});
-
-		// Create and return the dialog
-		AlertDialog dlg = alert.create();
-		return dlg;
-	}
+		if (requestCode == 1 && contadorValidas == 3) {
+			switch (requestCode) {
+			case _ReqEnterLockPattern: {
+				int msgId = 0;
+				switch (resultCode) {
+				case RESULT_OK:
+					msgId = android.R.string.ok;
+					flashito.parar();
+					player.stop();
+					contadorValidas = 0;
+					this.finish();
+					break;
+				case RESULT_CANCELED:
+					msgId = android.R.string.cancel;
+					break;
+				case LockPatternActivity._ResultFailed:
+					msgId = R.string.failed;
+					break;
+				default:
+					return;
+				}
+				break;
+			}// _ReqEnterLockPattern
+			}
+		} else {
+			Toast.makeText(getApplicationContext(),
+					"Le quedan " + (3 - contadorValidas) + " veces",
+					Toast.LENGTH_SHORT).show();
+			contadorValidas = contadorValidas + 1;
+			crearPatron();
+		}
+	}// onActivityResult()
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
@@ -114,7 +106,8 @@ public class PatronLock extends Activity implements OnCompletionListener {
 	}
 
 	public void onBackPressed() {
-		super.onBackPressed();
+		Toast.makeText(getApplicationContext(),
+				"Usted Tiene que elegir un Patrón", Toast.LENGTH_SHORT).show();
 	}
-	
+
 }
