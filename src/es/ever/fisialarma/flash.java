@@ -21,14 +21,16 @@ public class flash {
 	Timer timer, timer2;
 
 	public flash(Context context) {
-		if(dispCamara == null){
-		dispCamara = Camera.open();
+		if (dispCamara == null) {
+			dispCamara = Camera.open();
 		}
 		contexto = context;
-		
+
+		if (timer == null & timer2 == null) {
 			timer = new Timer();
 			timer2 = new Timer();
-		
+		}
+
 		timer.scheduleAtFixedRate(new TimerTask() {
 
 			public void run() {
@@ -36,7 +38,7 @@ public class flash {
 				if (encendido) {
 					encenderLinternaAndroid();
 				} else {
-					timer.cancel();
+					terminar();
 				}
 			}
 		}, delay1, period1);
@@ -107,4 +109,11 @@ public class flash {
 		encendido = false;
 	}
 
+	public void terminar() {
+		timer.cancel();
+		timer2.cancel();
+		dispCamara = null;
+		// timer = null;
+		// timer2 = null;
+	}
 }

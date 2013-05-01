@@ -2,6 +2,7 @@ package es.ever.fisialarma;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import es.ever.fisialarma.PatronLock;
 import android.content.Intent;
 
 public class AlarmaReceiver extends BroadcastReceiver{
@@ -14,16 +15,12 @@ public class AlarmaReceiver extends BroadcastReceiver{
 			if (ALARM_ACTION_NAME.equals(intent.getAction())) {
 				// Launch the alarm popup dialog
 				Intent alarmIntent = new Intent("android.intent.action.MAIN");
+
 				alarmIntent.setClass(context, PatronLock.class);
 				alarmIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-				// Pass on the alarm ID as extra data
-				alarmIntent.putExtra("AlarmID", intent.getIntExtra("AlarmID", -1));
-				alarmIntent.putExtra("AlarmTime",
-						intent.getStringExtra("AlarmTime"));
 				// Start the popup activity
 				context.startActivity(alarmIntent);
-				
+
 			}
 			/*
 			 * PackageManager packageManager = context.getPackageManager(); Intent
@@ -59,10 +56,4 @@ public class AlarmaReceiver extends BroadcastReceiver{
 			 * pending intent to your component // .... }
 			 */
 		}
-		
-		public void stop() {
-			// TODO Auto-generated method stub
-			abortBroadcast();
-		}
-		
 }

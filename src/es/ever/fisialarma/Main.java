@@ -45,7 +45,7 @@ public class Main extends SherlockActivity {
 	int estado;
 	TextView hora;
 	datos info;
-
+	int e=0;
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +59,9 @@ public class Main extends SherlockActivity {
 		hora = (TextView) findViewById(R.id.textfecha);
 		switchA = (Switch) findViewById(R.id.switch_a);
 		try {
+			if(info == null){
 			info = new datos(this);
+			}
 			info.abrir();
 			info.insertar(1, 0, 0);
 			// aqui todos los datos de la consulta
@@ -87,13 +89,15 @@ public class Main extends SherlockActivity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
-
 				if (isChecked) {
 					enableBroadcastReceiver();
 					openTimePickerDialog(false);
 				} else {
 					disableBroadcastReceiver();
+					if(e == 0){
+					hora.setText("");
 					Toast.makeText(getApplicationContext(), "Alarma Cancelada", Toast.LENGTH_SHORT).show();
+					}
 				}
 			}
 		});
@@ -101,13 +105,14 @@ public class Main extends SherlockActivity {
 
 	private void openTimePickerDialog(boolean is24r) {
 		Calendar calendar = Calendar.getInstance();
-
+		if(tpd == null){
 		tpd = new TimePickerDialog(Main.this, onTimeSetListener,
 				calendar.get(Calendar.HOUR_OF_DAY),
 				calendar.get(Calendar.MINUTE) + 1, is24r);
+		}
 		tpd.setTitle("Escoja La Hora");
 
-		// Set the Cancel button
+		// evento del boton cancelar TimePickerDialog
 		tpd.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
@@ -139,7 +144,6 @@ public class Main extends SherlockActivity {
 		    pm.setComponentEnabledSetting(receiver,
 		            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
 		            PackageManager.DONT_KILL_APP);
-		    Toast.makeText(this, "La Alarma cancelada", Toast.LENGTH_SHORT).show();
 		 }   
 	 
 	 //metodo para iniciar denuevo el BroadcastReceiver
@@ -173,7 +177,7 @@ public class Main extends SherlockActivity {
 			Intent in = new Intent(getBaseContext(), Main.class);
 			PendingIntent pi = PendingIntent.getActivity(getBaseContext(), 0,
 					in, 0);
-			String cuerpo = "Alarma Iniciada";
+			String cuerpo = "Alarma Iniciada ";
 			String titulo = "Despertador";
 
 			Notification n = new Notification(R.drawable.ic_launcher, cuerpo,
@@ -182,17 +186,18 @@ public class Main extends SherlockActivity {
 			n.defaults = Notification.DEFAULT_ALL;
 			notificacion.notify(unico, n);
 			setAlarm(calSet);
-			switchA.setChecked(true);
+			//switchA.setChecked(true);
 		}
 
 	};
 
 	// boton cancel
-	protected void finalize() throws Throwable {
+	protected void onDestroy() {
 		tpd = null;
 		info = null;
 		switchA = null;
 		notificacion = null;
+		super.onDestroy();
 	};
 	
 	private void setAlarm(Calendar targetCal) {
@@ -209,29 +214,26 @@ public class Main extends SherlockActivity {
 
 		String time = hours + " : " + mnts + " : " + str;
 		hora.setText(time);
-		hora.setText("***\n" + "Alarma  " + targetCal.getTime() + "\n"
-				+ "***\n");
+		hora.setText("***\n" + "Alarma  "
+				+ targetCal.getTime() + "\n" + "***\n");
 
 		AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		Intent alarmIntent = new Intent(ALARM_ACTION_NAME);
 
-		// Set the Alarm ID as extra data to be displayed in the popup
-		alarmIntent.putExtra("AlarmID", m_alarmId);
-		alarmIntent.putExtra("AlarmTime", time);
-
 		// Create the corresponding PendingIntent object
 		PendingIntent alarmPI = PendingIntent.getBroadcast(this, m_alarmId,
 				alarmIntent, 0);
-		
+
 		// Register the alarm with the alarm manager
-		
 		alarmManager.set(AlarmManager.RTC_WAKEUP, targetCal.getTimeInMillis(),
 				alarmPI);
 	}
 
+
 	@Override
 	protected void onRestart() {
 		// TODO Auto-generated method stub
+		e = 1;
 		switchA.setChecked(false);
 		Toast.makeText(getApplicationContext(), "Saliendo de la Aplicación", Toast.LENGTH_SHORT).show();
 		this.finish();
